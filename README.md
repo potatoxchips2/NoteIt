@@ -9,6 +9,8 @@ Group Members & Roles:
 Shari Li
 Khushi Patel - Backend & Cloud Engineer
 Sade Adeaca
+Muhammad Javed
+
 
 
 Frontend Engineer - 
