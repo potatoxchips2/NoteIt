@@ -1,16 +1,15 @@
-html, body #root{
+html, body {
     height: 100%;
     margin: 0;
-  }
-  
+    font-family: "Poppins", system-ui, sans-serif;
+}
+
 body {
-    display: flex;
-    justify-content: center;  /* horizontal */
-    align-items: center;      /* vertical */
-    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  }
-.text {
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
+    padding: 40px;
+}
+
+.button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
