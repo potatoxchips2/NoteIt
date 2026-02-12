@@ -14,11 +14,26 @@
     </head>
 
     <body>
-        <h1> note it website</h1>
+  </head>
 
-        <div class="button">
-            <button type="submit"> Create New Button</button>
-        </div>
+<body>
+    <h1>Note It Website</h1>
+
+    <!-- FORM -->
+    <form id="noteForm">
+        <input type="text" id="title" placeholder="Note Title" required>
+        <br><br>
+        <textarea id="content" placeholder="Write your note..." required></textarea>
+        <br><br>
         
-    </body>
+        <div class="button">
+            <button type="submit">Create New Note</button>
+        </div>
+    </form>
+
+    <!-- NOTES DISPLAY -->
+    <div id="notesContainer"></div>
+
+    <script src="note.js"></script>
+</body>
 </html>
