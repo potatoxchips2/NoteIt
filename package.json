@@ -1,0 +1,23 @@
+{
+  "name": "noteit",
+  "version": "1.0.0",
+  "description": "CSIT415 Final Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/potatoxchips2/NoteIt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/potatoxchips2/NoteIt/issues"
+  },
+  "homepage": "https://github.com/potatoxchips2/NoteIt#readme",
+  "dependencies": {
+    "firebase": "^12.9.0"
+  }
+}
