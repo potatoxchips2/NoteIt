@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title> NOTEIT WEBSITE</title>
-        <style>
-            .button {
-                position: fixed; 
-                bottom: 20px;    
-                right: 20px;     
-                z-index: 1000;  
-            }
-        </style>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>NOTEIT WEBSITE</title>
 
-    <body>
-  </head>
+    <style>
+        .button {
+            position: fixed; 
+            bottom: 20px;    
+            right: 20px;     
+            z-index: 1000;  
+        }
+    </style>
+</head>
 
 <body>
+
     <h1>Note It Website</h1>
 
     <!-- FORM -->
     <form id="noteForm">
         <input type="text" id="title" placeholder="Note Title" required>
         <br><br>
+
         <textarea id="content" placeholder="Write your note..." required></textarea>
         <br><br>
         
@@ -34,6 +34,20 @@
     <!-- NOTES DISPLAY -->
     <div id="notesContainer"></div>
 
-    <script src="note.js"></script>
+    <!-- AUTH PROTECTION -->
+    <script type="module">
+        import { auth } from "./firebase.js";
+        import { onAuthStateChanged } from "firebase/auth";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            }
+        });
+    </script>
+
+    <!-- MAIN SCRIPT -->
+    <script type="module" src="note.js"></script>
+
 </body>
 </html>

@@ -1,22 +1,24 @@
 // Log in 
 
-import { auth, provider } from "./firebase";
-import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "./firebase.js";
+import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
 
 const handleGoogleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     console.log(result.user);
+
+    // redirect after login
+    window.location.href = "home.html";
+
   } catch (error) {
     console.error(error);
   }
 };
 
-<button onClick={handleGoogleLogin}>
-  Sign in with Google
-</button>
+const loginBtn = document.getElementById("google-login");
 
-import { onAuthStateChanged } from "firebase/auth";
+loginBtn.addEventListener("click", handleGoogleLogin);
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
