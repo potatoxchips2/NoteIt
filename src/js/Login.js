@@ -1,23 +1,23 @@
 import { auth, provider } from "./firebase.js";
-import { signInWithPopup } from "firebase/auth";
+import {
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-console.log("login.js loaded");
+const googleBtn = document.getElementById("googleLoginBtn");
 
-document.addEventListener("DOMContentLoaded", () => {
-    const loginBtn = document.getElementById("google-login");
-    console.log("Button:", loginBtn);
+googleBtn.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, provider);
+    window.location.href = "home.html";
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+});
 
-    loginBtn.addEventListener("click", async () => {
-        console.log("Button clicked");
-
-        try {
-            const result = await signInWithPopup(auth, provider);
-            console.log("Logged in:", result.user.email);
-
-            window.location.href = "home.html";
-
-        } catch (error) {
-            console.error("Login error:", error);
-        }
-    });
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "home.html";
+  }
 });

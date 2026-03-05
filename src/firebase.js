@@ -1,17 +1,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCkTHZxPxxCU9duApGXrcQdh9-fB7YxtRU",
-  authDomain: "noteit-e97f4.firebaseapp.com",
-  projectId: "noteit-e97f4",
-  storageBucket: "noteit-e97f4.firebasestorage.app",
-  messagingSenderId: "574621367786",
-  appId: "1:574621367786:web:40fb273a33409ecae38693"
+  apiKey: "AIzaSyBQag1nQJPGm-LnxSCfIfUI42DNQ8Ev1_w",
+  authDomain: "noteit-8b57d.firebaseapp.com",
+  projectId: "noteit-8b57d",
+  storageBucket: "noteit-8b57d.firebasestorage.app",
+  messagingSenderId: "913521285762",
+  appId: "1:913521285762:web:6f6eb3e2a377f78b2a729b",
+  measurementId: "G-TK4K3XLZZR"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-export { auth, provider };
+export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider();
+export const db = getFirestore(app);
