@@ -1,21 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQag1nQJPGm-LnxSCfIfUI42DNQ8Ev1_w",
-      authDomain: "noteit-8b57d.firebaseapp.com",
-      projectId: "noteit-8b57d",
-      storageBucket: "noteit-8b57d.firebasestorage.app",
-      messagingSenderId: "913521285762",
-      appId: "1:913521285762:web:6f6eb3e2a377f78b2a729b",
-      measurementId: "G-TK4K3XLZZR"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
+import { auth,db } from"./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp } from
+ "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    
+  document.addEventListener("DOMContentLoaded", () => {;
     let currentUser = null;
 
     // ── AUTH GUARD ──
@@ -156,3 +144,4 @@ import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, serve
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => t.className = "toast", 3000);
     }
+  });
