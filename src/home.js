@@ -5,6 +5,7 @@ import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimest
     
   document.addEventListener("DOMContentLoaded", () => {;
     let currentUser = null;
+    let allNotes = [];
 
     // ── AUTH GUARD ──
     onAuthStateChanged(auth, (user) => {
@@ -87,25 +88,62 @@ import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimest
         }
 
         grid.innerHTML = "";
+
+        allNotes = [];
         snapshot.forEach((docSnap, i) => {
           const data = docSnap.data();
+          allNotes.push({ id: docSnap.id, ...data });
           const date = data.createdAt?.toDate
             ? data.createdAt.toDate().toLocaleDateString("en-US", { month:"short", day:"numeric" })
             : "Just now";
-
-          const card = document.createElement("div");
-          card.className = `note-card tag-${data.folder || "other"}`;
-          card.style.animationDelay = (i * 0.05) + "s";
-          card.innerHTML = `
-            <div class="note-folder">${folderLabel(data.folder)}</div>
-            <div class="note-title">${escHtml(data.title || "Untitled")}</div>
-            <div class="note-preview">${escHtml(data.text || "")}</div>
-            <div class="note-footer">
-              <span>${date}</span>
-              <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
-            </div>`;
-          grid.appendChild(card);
+          renderNotes(allNotes);
         });
+
+        function renderNotes(notes) {
+  const grid = document.getElementById("notesGrid");
+  grid.innerHTML = "";
+
+  notes.forEach((data, i) => {
+    const date = data.createdAt?.toDate
+      ? data.createdAt.toDate().toLocaleDateString("en-US", { month:"short", day:"numeric" })
+      : "Just now";
+
+    const card = document.createElement("div");
+    card.className = `note-card tag-${data.folder || "other"}`;
+    card.style.animationDelay = (i * 0.05) + "s";
+
+    card.innerHTML = `
+      <div class="note-folder">${folderLabel(data.folder)}</div>
+      <div class="note-title">${escHtml(data.title || "Untitled")}</div>
+      <div class="note-preview">${escHtml(data.text || "")}</div>
+      <div class="note-footer">
+        <span>${date}</span>
+        <button class="btn-delete" data-id="${data.id}">🗑 Delete</button>
+      </div>`;
+
+    grid.appendChild(card);
+    });
+
+    // reattach delete listeners
+    document.querySelectorAll(".btn-delete").forEach(btn => {
+      btn.onclick = async () => {
+        await deleteDoc(doc(db, "notes", btn.dataset.id));
+        showToast("Note deleted");
+        loadNotes();
+      };
+    });
+  }
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase();
+
+  const filtered = allNotes.filter(note =>
+    (note.title && note.title.toLowerCase().includes(query)) ||
+    (note.text && note.text.toLowerCase().includes(query))
+  );
+
+  renderNotes(filtered);
+  });
 
         // Delete handlers
         grid.querySelectorAll(".btn-delete").forEach(btn => {
