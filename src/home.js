@@ -1,11 +1,11 @@
-import { auth,db } from"./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp } from
- "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
     
   document.addEventListener("DOMContentLoaded", () => {;
     let currentUser = null;
     let allNotes = [];
+    let editingNoteId = null;
 
     // ── AUTH GUARD ──
     onAuthStateChanged(auth, (user) => {
@@ -97,6 +97,22 @@ import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimest
             ? data.createdAt.toDate().toLocaleDateString("en-US", { month:"short", day:"numeric" })
             : "Just now";
           renderNotes(allNotes);
+
+          const card = document.createElement("div");
+          card.className = `note-card tag-${data.folder || "other"}`;
+          card.style.animationDelay = (i * 0.05) + "s";
+          card.innerHTML = `
+            <div class="note-folder">${folderLabel(data.folder)}</div>
+            <div class="note-title">${escHtml(data.title || "Untitled")}</div>
+            <div class="note-preview">${escHtml(data.text || "")}</div>
+            <div class="note-footer">
+              <span>${date}</span>
+              <div class="note-actions">
+                <button class="btn-edit" data-id="${docSnap.id}">✏️ Edit</button>
+                <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
+              </div>
+            </div>`;
+          grid.appendChild(card);
         });
 
         function renderNotes(notes) {
