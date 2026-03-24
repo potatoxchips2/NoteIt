@@ -1,10 +1,10 @@
-import { auth,db } from"./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp } from
- "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
     
   document.addEventListener("DOMContentLoaded", () => {;
     let currentUser = null;
+    let editingNoteId = null;
 
     // ── AUTH GUARD ──
     onAuthStateChanged(auth, (user) => {
@@ -102,7 +102,10 @@ import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimest
             <div class="note-preview">${escHtml(data.text || "")}</div>
             <div class="note-footer">
               <span>${date}</span>
-              <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
+              <div class="note-actions">
+                <button class="btn-edit" data-id="${docSnap.id}">✏️ Edit</button>
+                <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
+              </div>
             </div>`;
           grid.appendChild(card);
         });
