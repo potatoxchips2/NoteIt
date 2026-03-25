@@ -200,10 +200,18 @@
       top:0; left:0; right:0;
       height: 3px;
     }
-    .note-card.tag-school::before { background: #c8f04a; }
-    .note-card.tag-work::before   { background: #7c6dfa; }
-    .note-card.tag-personal::before { background: #f06292; }
-    .note-card.tag-other::before  { background: #4fc3f7; }
+    .note-card.tag-school::before { 
+      background: #c8f04a; 
+    }
+    .note-card.tag-work::before { 
+      background: #7c6dfa; 
+    }
+    .note-card.tag-personal::before { 
+      background: #f06292; 
+    }
+    .note-card.tag-other::before  { 
+      background: #4fc3f7; 
+    }
 
     .note-folder {
       font-size: .68rem;
@@ -310,9 +318,61 @@
 
     .note-card:hover .btn-delete, .note-card:hover .btn-edit { opacity: 1; }
 
-    .btn-delete:hover { color: #ff6b6b; background: rgba(255,107,107,.1); }
-    .btn-edit:hover { color: #c8f04a; background: rgba(255,107,107,.1)}
-
-    
-
-
+    /* LIGHT MODE */
+    .btn-delete:hover { 
+      color: #ff6b6b; 
+      background: rgba(255,107,107,.1); 
+    }
+    .btn-edit:hover { 
+      color: #c8f04a; 
+      background: rgba(255,107,107,.1)
+    }
+    body.light-mode { 
+      background: #f5f5f7 !important; 
+      color: #111 !important; 
+    }
+    body.light-mode .topbar { 
+      background: #ffffff !important; 
+      border-bottom: 1px solid #e0e0e0 !important; 
+    }
+    body.light-mode .logo { 
+      color: #111 !important; 
+    }
+    body.light-mode .welcome { 
+      color: #555 !important; 
+    }
+    body.light-mode .btn-logout, body.light-mode #themeToggle { 
+      background: #f0f0f0 !important; 
+      border-color: #ddd !important; 
+      color: #555 !important; 
+    }
+    body.light-mode .composer { 
+      background: #ffffff !important; 
+      border-color: #e0e0e0 !important; 
+    }
+    body.light-mode .composer input[type="text"], body.light-mode .composer textarea, body.light-mode .composer select { 
+      background: #f9f9f9 !important; 
+      border-color: #ddd !important; 
+      color: #111 !important; }
+    body.light-mode .note-card { 
+      background: #ffffff !important; 
+      border-color: #e0e0e0 !important; 
+      color: #111 !important; 
+    }
+    body.light-mode .note-preview { 
+      color: #666 !important; 
+    }
+    body.light-mode .note-folder { 
+      color: #888 !important; 
+    }
+    body.light-mode .note-footer { 
+      color: #999 !important; 
+      border-top-color: #eee !important; 
+    }
+    body.light-mode .toast { 
+      background: #ffffff !important; 
+      color: #111 !important; 
+    }
+    body.light-mode .main { 
+      background: #f5f5f7 !important; 
+    }

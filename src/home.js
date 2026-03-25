@@ -110,6 +110,11 @@ import { auth, db } from "./firebase.js";
           grid.appendChild(card);
         });
 
+        <div class="note-actions">
+          <button class="btn-edit" data-id="${docSnap.id}">✏️ Edit</button>
+          <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
+        </div>
+
         // Delete handlers
         grid.querySelectorAll(".btn-delete").forEach(btn => {
           btn.addEventListener("click", async (e) => {
