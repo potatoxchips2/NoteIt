@@ -46,7 +46,10 @@
       cursor: pointer;
       transition: all .2s;
     }
-    .btn-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
+    .btn-logout:hover { 
+      border-color: #ff6b6b; 
+      color: #ff6b6b; 
+    }
     .btn-theme {
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
@@ -58,7 +61,10 @@
       cursor: pointer;
       transition: all .2s;
     }
-    .btn-theme:hover { border-color: rgba(200,240,74,.5); color: #f0f0f0; }
+    .btn-theme:hover { 
+      border-color: rgba(200,240,74,.5); 
+      color: #f0f0f0; 
+    }
 
     /* MAIN */
     .main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
@@ -120,6 +126,8 @@
       text-align: center;
       font-size: .76rem;
       color: rgba(255,255,255,.72);
+    }
+
     .btn-logout:hover { 
       border-color: #ff6b6b; 
       color: #ff6b6b; 
@@ -591,10 +599,10 @@
       color: #1A1D23;; }
     body.light-mode .note-card { 
       background: #ffffff !important; 
-      border-color: 1px solid #D1D5DB; 
+      border: 1px solid #D1D5DB; 
     }
     body.light-mode .note-card:hover {
-      border-color: #8FBF9A;
+      border: #8FBF9A;
       box-shadow: 0 8px 25px rgba(143,191,154,.2);
     }
     body.light-mode .note-preview { 
@@ -609,19 +617,13 @@
     }
     body.light-mode .btn-favorite {
       background: rgba(255,255,255,.95) !important;
-      border-color: #e0e0e0 !important;
+      border: #e0e0e0 !important;
       color: #8a8a8a !important;
     }
     body.light-mode .btn-favorite.active {
       background: #fff8d6 !important;
-      border-color: #f1d86a !important;
+      border: #f1d86a !important;
       color: #b8860b !important;
-    }
-    body.light-mode .toast { 
-      background: #ffffff !important; 
-      color: #111 !important; 
-      color: #9CA3AF;
-      border-top: 1px solid #E5E7EB;
     }
     body.light-mode .toast {
       background: #FFFFFF;

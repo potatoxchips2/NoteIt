@@ -45,7 +45,15 @@ import { auth, db } from "./firebase.js";
     document.getElementById("saveBtn").addEventListener("click", async () => {
       const title = document.getElementById("noteTitle").value.trim();
       const body = document.getElementById("noteBody").value.trim();
-      const folder = document.getElementById("noteFolder").value;
+
+      const selectedFolder = document.getElementById("noteFolder").value;
+      const newFolder = document.getElementById("newFolderInput")?.value.trim();
+
+      const folder = selectedFolder === "other" && newFolder
+        ? newFolder
+        : selectedFolder;
+
+      const folderColor = getFolderColor(folder);
 
       if (!title) { showToast("Please add a title!", true); return; }
       if (!body)  { showToast("Note can't be empty!", true); return; }
@@ -58,6 +66,7 @@ import { auth, db } from "./firebase.js";
             title: title,
             text: body,
             folder: folder,
+            folderColor: folderColor,
         });
         showToast("Note saved ✓");
         editingNoteId = null;
@@ -68,7 +77,8 @@ import { auth, db } from "./firebase.js";
             text: body,
             folder: folder,
             userId: currentUser.uid,
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            folderColor: folderColor,
           });
           showToast("Note saved ✓");
         }
@@ -76,6 +86,9 @@ import { auth, db } from "./firebase.js";
         document.getElementById("noteTitle").value = "";
         document.getElementById("noteBody").value = "";
         document.getElementById("composer").classList.remove("open");
+
+        document.getElementById("newFolderInput").value = "";
+        document.getElementById("newFolderInput").style.display = "none"; 
         loadNotes();
       
       } catch (err) {
@@ -182,7 +195,7 @@ import { auth, db } from "./firebase.js";
       school: "#8FBF9A",
       work: "#7FA8FF",
       personal: "#F28FA9",
-        other: "#9AA3AF"
+      other: "#9AA3AF"
     }[folder] || "#8FBF9A";
   }
 
