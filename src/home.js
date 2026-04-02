@@ -276,39 +276,35 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
     }
   });
   // ── EXPORT TO PDF ──
-function exportToPDF(title, text) {
-  const w = window.open("", "_blank");
-  if (!w) { alert("Please allow popups for this site to export PDF."); return; }
-  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
-  <style>
-    body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; color: #111; line-height: 1.8; }
-    h1 { font-size: 2rem; border-bottom: 3px solid #c8f04a; padding-bottom: 12px; margin-bottom: 8px; }
-    .meta { font-size: .82rem; color: #888; margin-bottom: 36px; }
-    p { font-size: 1rem; white-space: pre-wrap; }
-    .footer { margin-top: 60px; font-size: .72rem; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
-  </style></head><body>
-  <h1>${title}</h1>
-  <div class="meta">Exported from NoteIT — ${new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</div>
-  <p>${text}</p>
-  <div class="footer">NoteIT — Your notes, organized & synced everywhere.</div>
-  </body></html>`);
-  w.document.close();
-  setTimeout(() => { w.print(); }, 500);
-}
+  function exportToPDF(title, text) {
+    const w = window.open("", "_blank");
+    if (!w) { alert("Please allow popups for this site to export PDF."); return; }
+      w.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
+      <style>
+        body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; color: #111; line-height: 1.8; }
+        h1 { font-size: 2rem; border-bottom: 3px solid #c8f04a; padding-bottom: 12px; margin-bottom: 8px; }
+        .meta { font-size: .82rem; color: #888; margin-bottom: 36px; }
+        p { font-size: 1rem; white-space: pre-wrap; }
+        .footer { margin-top: 60px; font-size: .72rem; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
+      </style></head><body>
+      <h1>${title}</h1>
+      <div class="meta">Exported from NoteIT — ${new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</div>
+      <p>${text}</p>
+      <div class="footer">NoteIT</div>
+    </body></html>`);
+      w.document.close();
+    setTimeout(() => { w.print(); }, 500);
+  }
 
-// ── EXPORT TO TXT ──
-function exportToTXT(title, text) {
-  const content = `${title}\n${"=".repeat(title.length)}\n\nExported from NoteIT on ${new Date().toLocaleDateString()}\n\n${text}`;
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt";
-  a.click();
-  URL.revokeObjectURL(url);
-<<<<<<< HEAD
-}
-=======
-  showToast("Downloaded as .txt ✓");
-}
->>>>>>> dbaf339483f06a4a499f5653eb2ae97f457e9667
+  // ── EXPORT TO TXT ──
+  function exportToTXT(title, text) {
+    const content = `${title}\n${"=".repeat(title.length)}\n\nExported from NoteIT on ${new Date().toLocaleDateString()}\n\n${text}`;
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Downloaded as .txt ✓");
+  }
