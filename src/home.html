@@ -6,8 +6,6 @@
   <title>NoteIT — Home</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="home_style.css"/>
-    
-=
 </head>
 <body>
 
@@ -16,16 +14,32 @@
     <div class="logo">Note<span>IT</span></div>
     <div class="topbar-right">
       <span class="welcome" id="welcomeMsg">Loading...</span>
-      <button class="btn-logout" id="logoutBtn">Sign Out</button><button id="themeToggle" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;">☀️ Light Mode</button>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+      <button class="btn-theme" id="themeToggle">☀️ Light Mode</button>
     </div>
   </div>
 
   <!-- MAIN -->
-  <div class="main">
-    <div class="section-header">
-      <div class="section-title">My Notes</div>
-      <button class="btn-new" id="newNoteBtn">+ New Note</button>
-    </div>
+  <div class="main shell">
+    <aside class="sidebar">
+      <div class="sidebar-label">Browse</div>
+      <button class="nav-tab active" data-filter="all" id="allNotesTab">
+        <span>All Notes</span>
+        <span class="nav-count" id="allCount">0</span>
+      </button>
+      <button class="nav-tab" data-filter="favorites" id="favoritesTab">
+        <span>Favorites</span>
+        <span class="nav-count" id="favoritesCount">0</span>
+      </button>
+    </aside>
+
+    <div class="content">
+      <div class="section-header">
+        <div>
+          <div class="section-title" id="sectionTitle">My Notes</div>
+        </div>
+        <button class="btn-new" id="newNoteBtn">+ New Note</button>
+      </div>
 
     <!-- COMPOSER -->
     <div class="composer" id="composer">
@@ -48,217 +62,13 @@
     </div>
 
     <!-- NOTES -->
-    <div class="notes-grid" id="notesGrid">
-      <div class="loading">Loading your notes...</div>
-    </div>
+      <div class="notes-grid" id="notesGrid">
+        <div class="loading">Loading your notes...</div>
+      </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, serverTimestamp }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBQag1nQJPGm-LnxSCfIfUI42DNQ8Ev1_w",
-      authDomain: "noteit-8b57d.firebaseapp.com",
-      projectId: "noteit-8b57d",
-      storageBucket: "noteit-8b57d.firebasestorage.app",
-      messagingSenderId: "913521285762",
-      appId: "1:913521285762:web:6f6eb3e2a377f78b2a729b",
-      measurementId: "G-TK4K3XLZZR"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
-
-    // ── AUTH GUARD ──
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-      currentUser = user;
-      document.getElementById("welcomeMsg").textContent =
-        "Hey, " + (user.displayName ? user.displayName.split(" ")[0] : user.email) + " 👋";
-      loadNotes();
-    });
-
-    // ── LOGOUT ──
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    });
-
-    // ── FOLDER SELECT LOGIC ──
-    document.getElementById("noteFolder").addEventListener("change", function () {
-      const input = document.getElementById("newFolderInput");
-      input.style.display = this.value === "other" ? "block" : "none";  
-    });
-
-    // ── COMPOSER TOGGLE ──
-    document.getElementById("newNoteBtn").addEventListener("click", () => {
-      document.getElementById("composer").classList.add("open");
-      document.getElementById("noteTitle").focus();
-    });
-    document.getElementById("cancelBtn").addEventListener("click", () => {
-      document.getElementById("composer").classList.remove("open");
-      document.getElementById("newFolderInput").value = "";
-      document.getElementById("newFolderInput").style.display = "none";
-      document.getElementById("noteTitle").value = "";
-      document.getElementById("noteBody").value = "";
-    });
-
-    // ── SAVE NOTE ──
-    document.getElementById("saveBtn").addEventListener("click", async () => {
-      const title = document.getElementById("noteTitle").value.trim();
-      const body = document.getElementById("noteBody").value.trim();
-      const selectedFolder = document.getElementById("noteFolder").value;
-      const newFolder = document.getElementById("newFolderInput").value.trim();
-
-      const folder = selectedFolder === "other" && newFolder ? newFolder : selectedFolder;
-      
-      if (!title) { showToast("Please add a title!", true); return; }
-      if (!body)  { showToast("Note can't be empty!", true); return; }
-      if (!currentUser) return;
-
-      try {
-        await addDoc(collection(db, "notes"), {
-          title: title,
-          text: body,
-          folder: folder,
-          folderColor: getFolderColor(folder),
-          userId: currentUser.uid,
-          createdAt: serverTimestamp(),
-        });
-        document.getElementById("noteTitle").value = "";
-        document.getElementById("noteBody").value = "";
-        document.getElementById("composer").classList.remove("open");
-        showToast("Note saved ✓");
-        loadNotes();
-      } catch (err) {
-        console.error(err);
-        showToast("Error saving note: " + err.message, true);
-      }
-    });
-
-    // ── LOAD NOTES ──
-    async function loadNotes() {
-      const grid = document.getElementById("notesGrid");
-      grid.innerHTML = '<div class="loading">Loading...</div>';
-
-      try {
-        const q = query(
-          collection(db, "notes"),
-          where("userId", "==", currentUser.uid),
-          orderBy("createdAt", "desc")
-        );
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          grid.innerHTML = `
-            <div class="empty">
-              <div class="empty-icon">📭</div>
-              <div class="empty-title">No notes yet</div>
-              <div class="empty-sub">Hit "+ New Note" to get started</div>
-            </div>`;
-          return;
-        }
-
-        grid.innerHTML = "";
-        snapshot.forEach((docSnap, i) => {
-          const data = docSnap.data();
-          const date = data.createdAt?.toDate
-            ? data.createdAt.toDate().toLocaleDateString("en-US", { month:"short", day:"numeric" })
-            : "Just now";
-
-          const card = document.createElement("div");
-          card.style.setProperty('--folder-color', data.folderColor || '#8FBF9A');
-          card.className = `note-card tag-${data.folder || "other"}`;
-          card.style.animationDelay = (i * 0.05) + "s";
-          card.innerHTML = `
-            <div class="note-folder">${folderLabel(data.folder)}</div>
-            <div class="note-title">${escHtml(data.title || "Untitled")}</div>
-            <div class="note-preview">${escHtml(data.text || "")}</div>
-            <div class="note-footer">
-              <span>${date}</span>
-              <div class="note-action">
-                <button class="btn-edit" data-id="${docSnap.id}">✏️ Edit</button>
-                <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
-              </div>
-            </div>`;
-          grid.appendChild(card);
-        });
-
-        // Delete handlers
-        grid.querySelectorAll(".btn-delete").forEach(btn => {
-          btn.addEventListener("click", async (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            try {
-              await deleteDoc(doc(db, "notes", id));
-              showToast("Note deleted.");
-              loadNotes();
-            } catch (err) {
-              showToast("Error: " + err.message, true);
-            }
-          });
-        });
-
-      } catch (err) {
-        console.error(err);
-        grid.innerHTML = `<div class="loading">Error loading notes: ${err.message}</div>`;
-      }
-    }
-
-    function folderLabel(f) {
-      return { school:"📚 School", work:"💼 Work", personal:"🏠 Personal", other:"📌 Other" }[f] || "📌 Other";
-    }
-
-    function escHtml(str) {
-      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    }
-
-    function getFolderColor(folder) {
-      const defaults = {
-        school: "#8FBF9A",
-        work: "#7FA8FF",
-        personal: "#F28FA9",
-        other: "#9AA3AF"
-      };
-
-      if (defaults[folder]) 
-        return defaults[folder];
-
-      const colors = ["#8FBF9A", "#7FA8FF", "#F28FA9", "#F2C94C", "#56CCF2"];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }     
-
-    let toastTimer;
-    function showToast(msg, isErr = false) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = "toast show" + (isErr ? " err" : "");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.className = "toast", 3000);
-    }
-    document.getElementById("themeToggle").addEventListener("click", function() {
-  const isLight = document.body.classList.toggle("light-mode");
-  this.textContent = isLight ? "🌙 Dark Mode" : "☀️ Light Mode";
-  localStorage.setItem("theme", isLight ? "light" : "dark");
-});
-
-if (localStorage.getItem("theme") === "light") {
-  document.body.classList.add("light-mode");
-  document.getElementById("themeToggle").textContent = "🌙 Dark Mode";
-}
-  </script>
   <script type="module" src="home.js"></script>
   <script type="module" src="toggle.js"></script>
   

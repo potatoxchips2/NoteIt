@@ -1,10 +1,11 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, orderBy, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth, db } from "./firebase.js";
     
-  document.addEventListener("DOMContentLoaded", () => {;
+  document.addEventListener("DOMContentLoaded", () => {
     let currentUser = null;
     let editingNoteId = null;
+    let currentFilter = "all";
 
     // ── AUTH GUARD ──
     onAuthStateChanged(auth, (user) => {
@@ -24,6 +25,12 @@ import { auth, db } from "./firebase.js";
       window.location.href = "index.html";
     });
 
+    // ── FOLDER SELECT LOGIC ──
+    document.getElementById("noteFolder").addEventListener("change", function () {
+      const input = document.getElementById("newFolderInput");
+      input.style.display = this.value === "other" ? "block" : "none";  
+    });
+
     // ── COMPOSER TOGGLE ──
     document.getElementById("newNoteBtn").addEventListener("click", () => {
       document.getElementById("composer").classList.add("open");
@@ -35,42 +42,30 @@ import { auth, db } from "./firebase.js";
       document.getElementById("noteBody").value = "";
     });
 
-    /* ── SAVE NOTE ──
-    document.getElementById("saveBtn").addEventListener("click", async () => {
-      const title = document.getElementById("noteTitle").value.trim();
-      const body = document.getElementById("noteBody").value.trim();
-      const folder = document.getElementById("noteFolder").value;
+    // FAVORITE FILTER //
+    document.getElementById("allNotesTab").addEventListener("click", () => {
+    currentFilter = "all";
+    loadNotes();
+    });
 
-      if (!title) { showToast("Please add a title!", true); return; }
-      if (!body)  { showToast("Note can't be empty!", true); return; }
-      if (!currentUser) return;
-
-      try {
-        await addDoc(collection(db, "notes"), {
-          title: title,
-          text: body,
-          folder: folder,
-          folderColor: getFolderColor(folder), 
-          userId: currentUser.uid,
-          createdAt: serverTimestamp()
-        });
-        document.getElementById("noteTitle").value = "";
-        document.getElementById("noteBody").value = "";
-        document.getElementById("composer").classList.remove("open");
-        showToast("Note saved ✓");
-        loadNotes();
-      } catch (err) {
-        console.error(err);
-        showToast("Error saving note: " + err.message, true);
-      }
-    }); 
-    */
-
+    document.getElementById("favoritesTab").addEventListener("click", () => {
+      currentFilter = "favorites";
+      loadNotes();
+    });
+    
     // SAVE AND EDIT NOTE
     document.getElementById("saveBtn").addEventListener("click", async () => {
       const title = document.getElementById("noteTitle").value.trim();
       const body = document.getElementById("noteBody").value.trim();
-      const folder = document.getElementById("noteFolder").value;
+
+      const selectedFolder = document.getElementById("noteFolder").value;
+      const newFolder = document.getElementById("newFolderInput")?.value.trim();
+
+      const folder = selectedFolder === "other" && newFolder
+        ? newFolder
+        : selectedFolder;
+
+      const folderColor = getFolderColor(folder);
 
       if (!title) { showToast("Please add a title!", true); return; }
       if (!body)  { showToast("Note can't be empty!", true); return; }
@@ -83,6 +78,7 @@ import { auth, db } from "./firebase.js";
             title: title,
             text: body,
             folder: folder,
+            folderColor: folderColor,
         });
         showToast("Note saved ✓");
         editingNoteId = null;
@@ -92,16 +88,21 @@ import { auth, db } from "./firebase.js";
             title: title,
             text: body,
             folder: folder,
+            folderColor: folderColor,
             userId: currentUser.uid,
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            isFavorite: false,
           });
           showToast("Note saved ✓");
-      }
+        }
 
-      document.getElementById("noteTitle").value = "";
-      document.getElementById("noteBody").value = "";
-      document.getElementById("composer").classList.remove("open");
-      loadNotes();
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteBody").value = "";
+        document.getElementById("composer").classList.remove("open");
+
+        document.getElementById("newFolderInput").value = "";
+        document.getElementById("newFolderInput").style.display = "none"; 
+        loadNotes();
       
       } catch (err) {
         console.error(err);
@@ -132,7 +133,13 @@ import { auth, db } from "./firebase.js";
         }
 
         grid.innerHTML = "";
-        snapshot.forEach((docSnap, i) => {
+        let docs = snapshot.docs;
+
+        if (currentFilter === "favorites") {
+          docs = docs.filter(d => d.data().isFavorite);
+        }
+
+        docs.forEach((docSnap, i) => {
           const data = docSnap.data();
           const date = data.createdAt?.toDate
             ? data.createdAt.toDate().toLocaleDateString("en-US", { month:"short", day:"numeric" })
@@ -143,6 +150,7 @@ import { auth, db } from "./firebase.js";
           card.style.setProperty('--folder-color', data.folderColor || '#8FBF9A');
           card.style.animationDelay = (i * 0.05) + "s";
           card.innerHTML = `
+            <button class="btn-favorite ${data.isFavorite ? "active" : ""}" data-id="${docSnap.id}">★</button>
             <div class="note-folder">${folderLabel(data.folder)}</div>
             <div class="note-title">${escHtml(data.title || "Untitled")}</div>
             <div class="note-preview">${escHtml(data.text || "")}</div>
@@ -200,16 +208,34 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
             }
           });
         });
-
-        // EDIT HANDLERS
-        grid.querySelectorAll(".btn-edit").forEach(btn => {
+        grid.querySelectorAll(".btn-favorite").forEach(btn => {
           btn.addEventListener("click", async (e) => {
             e.stopPropagation();
             const id = btn.dataset.id;
 
             const note = snapshot.docs.find(d => d.id === id);
-            if (!note) return;
-            const data = note.data(); 
+          if (!note) return;
+
+          const current = note.data().isFavorite || false;
+
+          await updateDoc(doc(db, "notes", id), {
+            isFavorite: !current
+        });
+
+        loadNotes();
+          });
+        });
+
+        // EDIT HANDLERS
+        grid.querySelectorAll(".btn-edit").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            
+            const id = btn.dataset.id;
+            const note = snapshot.docs.find(d => d.id === id);
+            if (!note) return
+
+            const data = note.data();
             document.getElementById("noteTitle").value = data.title || "";
             document.getElementById("noteBody").value = data.text || "";
             document.getElementById("noteFolder").value = data.folder || "other";
@@ -236,7 +262,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       school: "#8FBF9A",
       work: "#7FA8FF",
       personal: "#F28FA9",
-        other: "#9AA3AF"
+      other: "#9AA3AF"
     }[folder] || "#8FBF9A";
   }
 
@@ -249,6 +275,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       toastTimer = setTimeout(() => t.className = "toast", 3000);
     }
   });
+<<<<<<< HEAD
   // ── EXPORT TO PDF ──
 function exportToPDF(title, text) {
   const w = window.open("", "_blank");
@@ -281,3 +308,5 @@ function exportToTXT(title, text) {
   URL.revokeObjectURL(url);
   showToast("Downloaded as .txt ✓");
 }
+=======
+>>>>>>> 1e5aff6b17ca82e1dd3e40f0652769d6997e3786
