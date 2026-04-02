@@ -7,6 +7,8 @@ import { auth, db } from "./firebase.js";
     let editingNoteId = null;
     let currentFilter = "all";
 
+    updateFilterTabs();
+
     // ── AUTH GUARD ──
     onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -44,12 +46,14 @@ import { auth, db } from "./firebase.js";
 
     // FAVORITE FILTER //
     document.getElementById("allNotesTab").addEventListener("click", () => {
-    currentFilter = "all";
-    loadNotes();
+      currentFilter = "all";
+      updateFilterTabs();
+      loadNotes();
     });
 
     document.getElementById("favoritesTab").addEventListener("click", () => {
       currentFilter = "favorites";
+      updateFilterTabs();
       loadNotes();
     });
     
@@ -121,14 +125,10 @@ import { auth, db } from "./firebase.js";
           where("userId", "==", currentUser.uid)
         );
         const snapshot = await getDocs(q);
+        updateCounts(snapshot.docs);
 
         if (snapshot.empty) {
-          grid.innerHTML = `
-            <div class="empty">
-              <div class="empty-icon">📭</div>
-              <div class="empty-title">No notes yet</div>
-              <div class="empty-sub">Hit "+ New Note" to get started</div>
-            </div>`;
+          renderEmptyState(grid);
           return;
         }
 
@@ -137,6 +137,11 @@ import { auth, db } from "./firebase.js";
 
         if (currentFilter === "favorites") {
           docs = docs.filter(d => d.data().isFavorite);
+        }
+
+        if (!docs.length) {
+          renderEmptyState(grid);
+          return;
         }
 
         docs.forEach((docSnap, i) => {
@@ -214,15 +219,24 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
             const id = btn.dataset.id;
 
             const note = snapshot.docs.find(d => d.id === id);
-          if (!note) return;
+            if (!note) return;
 
-          const current = note.data().isFavorite || false;
+            const current = note.data().isFavorite || false;
+            const nextValue = !current;
 
-          await updateDoc(doc(db, "notes", id), {
-            isFavorite: !current
-        });
+            await updateDoc(doc(db, "notes", id), {
+              isFavorite: nextValue
+            });
 
-        loadNotes();
+            if (nextValue) {
+              currentFilter = "favorites";
+              updateFilterTabs();
+              showToast("Note added to Favorites ✓");
+            } else {
+              showToast("Note removed from Favorites");
+            }
+
+            loadNotes();
           });
         });
 
@@ -251,6 +265,38 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
 
     function folderLabel(f) {
       return { school:"📚 School", work:"💼 Work", personal:"🏠 Personal", other:"📌 Other" }[f] || "📌 Other";
+    }
+
+    function renderEmptyState(grid) {
+      if (currentFilter === "favorites") {
+        grid.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">⭐</div>
+            <div class="empty-title">No favorite notes yet</div>
+            <div class="empty-sub">Tap the star on a note and it will show up here.</div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title">No notes yet</div>
+          <div class="empty-sub">Hit "+ New Note" to get started</div>
+        </div>`;
+    }
+
+    function updateFilterTabs() {
+      document.getElementById("allNotesTab")?.classList.toggle("active", currentFilter === "all");
+      document.getElementById("favoritesTab")?.classList.toggle("active", currentFilter === "favorites");
+    }
+
+    function updateCounts(docs) {
+      const allCount = docs.length;
+      const favoritesCount = docs.filter((docSnap) => docSnap.data().isFavorite).length;
+
+      document.getElementById("allCount").textContent = String(allCount);
+      document.getElementById("favoritesCount").textContent = String(favoritesCount);
     }
 
     function escHtml(str) {
