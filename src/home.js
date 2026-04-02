@@ -149,13 +149,43 @@ import { auth, db } from "./firebase.js";
             <div class="note-footer">
               <span>${date}</span>
               <div class="note-action">
+                <button class="btn-pdf" data-title="${escHtml(data.title)}" data-text="${escHtml(data.text)}">📄 PDF</button>
+                <button class="btn-txt" data-title="${escHtml(data.title)}" data-text="${escHtml(data.text)}">📝 TXT</button>
+                <button class="btn-copy" data-title="${escHtml(data.title)}" data-text="${escHtml(data.text)}">📋 Copy</button>
                 <button class="btn-edit" data-id="${docSnap.id}">✏️ Edit</button>
                 <button class="btn-delete" data-id="${docSnap.id}">🗑 Delete</button>
               </div>
             </div>`;
           grid.appendChild(card);
         });
+// PDF export handlers
+grid.querySelectorAll(".btn-pdf").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportToPDF(btn.dataset.title, btn.dataset.text);
+  });
+});
 
+// TXT download handlers
+grid.querySelectorAll(".btn-txt").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportToTXT(btn.dataset.title, btn.dataset.text);
+  });
+});
+
+// Copy to clipboard handlers
+grid.querySelectorAll(".btn-copy").forEach(btn => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(btn.dataset.title + "\n\n" + btn.dataset.text);
+      showToast("Copied to clipboard ✓");
+    } catch (err) {
+      showToast("Could not copy!", true);
+    }
+  });
+});
         // Delete handlers
         grid.querySelectorAll(".btn-delete").forEach(btn => {
           btn.addEventListener("click", async (e) => {
@@ -219,3 +249,35 @@ import { auth, db } from "./firebase.js";
       toastTimer = setTimeout(() => t.className = "toast", 3000);
     }
   });
+  // ── EXPORT TO PDF ──
+function exportToPDF(title, text) {
+  const w = window.open("", "_blank");
+  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; color: #111; line-height: 1.8; }
+    h1 { font-size: 2rem; border-bottom: 3px solid #c8f04a; padding-bottom: 12px; margin-bottom: 8px; }
+    .meta { font-size: .82rem; color: #888; margin-bottom: 36px; }
+    p { font-size: 1rem; white-space: pre-wrap; }
+    .footer { margin-top: 60px; font-size: .72rem; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
+  </style></head><body>
+  <h1>${title}</h1>
+  <div class="meta">Exported from NoteIT — ${new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</div>
+  <p>${text}</p>
+  <div class="footer">NoteIT — Your notes, organized & synced everywhere.</div>
+  </body></html>`);
+  w.document.close();
+  setTimeout(() => { w.print(); }, 500);
+}
+
+// ── EXPORT TO TXT ──
+function exportToTXT(title, text) {
+  const content = `${title}\n${"=".repeat(title.length)}\n\nExported from NoteIT on ${new Date().toLocaleDateString()}\n\n${text}`;
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Downloaded as .txt ✓");
+}
