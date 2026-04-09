@@ -41,6 +41,13 @@
         <button class="btn-new" id="newNoteBtn">+ New Note</button>
       </div>
 
+      <div class="search-row">
+        <label class="search-box" for="searchInput">
+          <span class="search-icon">⌕</span>
+          <input type="search" id="searchInput" placeholder="Search notes by title, keywords, or folder"/>
+        </label>
+      </div>
+
     <!-- COMPOSER -->
     <div class="composer" id="composer">
 
@@ -77,6 +84,38 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <button class="support-fab" id="supportFab" type="button" aria-controls="supportPanel" aria-expanded="false">
+    <span class="support-fab-icon">?</span>
+    <span>Support</span>
+  </button>
+
+  <section class="support-panel" id="supportPanel" aria-hidden="true">
+    <div class="support-panel-header">
+      <div>
+        <div class="support-eyebrow">Need help?</div>
+        <h2>Support</h2>
+      </div>
+      <button class="support-close" id="supportClose" type="button" aria-label="Close support panel">×</button>
+    </div>
+    <p class="support-copy">Send a message and it will be saved to Firebase for your team to review.</p>
+    <form class="support-form" id="supportForm">
+      <label class="support-field">
+        <span>Topic</span>
+        <select id="supportTopic" required>
+          <option value="Bug report">Bug report</option>
+          <option value="Account help">Account help</option>
+          <option value="Feature request">Feature request</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+      <label class="support-field">
+        <span>Message</span>
+        <textarea id="supportMessage" rows="5" maxlength="1000" placeholder="Tell us what happened or what you need help with." required></textarea>
+      </label>
+      <button class="support-submit" id="supportSubmit" type="submit">Send to Support</button>
+    </form>
+  </section>
 
   <script type="module" src="home.js"></script>
   <script type="module" src="toggle.js"></script>
