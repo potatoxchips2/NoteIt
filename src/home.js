@@ -40,7 +40,7 @@ import { auth, db } from "./firebase.js";
     });
     document.getElementById("cancelBtn").addEventListener("click", () => {
       document.getElementById("composer").classList.remove("open");
-      document.getElementById("noteTitle").value = "";
+      document.getElementById("noteTitle").innerHTML = "";
       document.getElementById("noteBody").innerHTML = "";
     });
 
@@ -59,7 +59,7 @@ import { auth, db } from "./firebase.js";
     
     // SAVE AND EDIT NOTE
     document.getElementById("saveBtn").addEventListener("click", async () => {
-      const title = document.getElementById("noteTitle").value.trim();
+      const title = document.getElementById("noteTitle").innerHTML.trim();
       const body = document.getElementById("noteBody").innerHTML.trim();
 
       const selectedFolder = document.getElementById("noteFolder").value;
@@ -100,7 +100,7 @@ import { auth, db } from "./firebase.js";
           showToast("Note saved ✓");
         }
 
-        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteTitle").innerHTML = "";
         document.getElementById("noteBody").innerHTML = "";
         document.getElementById("composer").classList.remove("open");
 
@@ -157,7 +157,7 @@ import { auth, db } from "./firebase.js";
           card.innerHTML = `
             <button class="btn-favorite ${data.isFavorite ? "active" : ""}" data-id="${docSnap.id}">★</button>
             <div class="note-folder">${folderLabel(data.folder)}</div>
-            <div class="note-title">${escHtml(data.title || "Untitled")}</div>
+            <div class="note-title">${data.title || "Untitled"}</div>
             <div class="note-preview">${data.text || ""}</div>
             <div class="note-footer">
               <span>${date}</span>
@@ -250,7 +250,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
             if (!note) return
 
             const data = note.data();
-            document.getElementById("noteTitle").value = data.title || "";
+            document.getElementById("noteTitle").innerHTML = data.title || "";
             document.getElementById("noteBody").innerHTML = data.text || "";
             document.getElementById("noteFolder").value = data.folder || "other";
             document.getElementById("composer").classList.add("open");

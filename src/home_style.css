@@ -328,6 +328,26 @@
       color : #8FBF9A;
     }
 
+    .title {
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid #1F2A24;
+      border-radius: 10px;
+      color: #E6E6E6;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      padding: 12px 16px;
+      outline: none;
+      min-height: 10px;
+      line-height: 1;
+      margin-bottom: 12px;
+      transition: border-color .2s;
+    }
+
+    .title:focus { 
+      border-color: #8FBF9A; 
+    }
+
     .note-body {
       width: 100%;
       background: rgba(255,255,255,.06);
