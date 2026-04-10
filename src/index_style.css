@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'DM Sans', sans-serif;
-      background: #0c0c0f;
+      background: #0F1115;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -10,13 +10,13 @@
     .bg {
       position: fixed; inset: 0; z-index: 0;
       background:
-        radial-gradient(ellipse 70% 60% at 75% 10%, rgba(200,240,74,.15) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 50% at 20% 90%, rgba(124,109,250,.12) 0%, transparent 60%);
+        radial-gradient(ellipse 70% 60% at 75% 10%, rgba(143,191,154,.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 20% 90%, rgba(42,47,54,.4) 0%, transparent 60%);
     }
     .card {
       position: relative; z-index: 1;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.1);
+      background: #1A1D23;
+      border: 1px solid #2A2F36;
       border-radius: 24px;
       padding: 52px 44px;
       width: 420px;
@@ -31,15 +31,12 @@
       font-family: 'Syne', sans-serif;
       font-weight: 800;
       font-size: 2.6rem;
-      color: #f0f0f0;
+      color: #E6E6E6;
       letter-spacing: -1px;
       margin-bottom: 6px;
     }
-    .logo span { color: #c8f04a; }
-    .tagline {
-      color: rgba(255,255,255,.4);
-      font-size: .88rem;
-      margin-bottom: 40px;
+    .logo span { 
+      color: #8FBF9A; 
     }
     .google-btn {
       width: 100%;
@@ -48,10 +45,10 @@
       justify-content: center;
       gap: 12px;
       padding: 14px 20px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.15);
+      background: #1F2A24;
+      border: 1px solid #2A2F36;
       border-radius: 12px;
-      color: #f0f0f0;
+      color: #E6E6E6;
       font-family: 'DM Sans', sans-serif;
       font-size: .95rem;
       font-weight: 500;
@@ -59,16 +56,18 @@
       transition: all .2s;
     }
     .google-btn:hover {
-      background: rgba(200,240,74,.1);
-      border-color: #c8f04a;
+      background: rgba(143,191,154,.12);
+      border-color: #8FBF9A;
       transform: translateY(-2px);
     }
     .status {
       margin-top: 16px;
       text-align: center;
       font-size: .8rem;
-      color: rgba(255,255,255,.35);
+      color: #9AA3AF;
       min-height: 20px;
       line-height: 1.5;
     }
-    .status.error { color: #ff6b6b; }
+    .status.error { 
+      color: #ff6b6b; 
+    }

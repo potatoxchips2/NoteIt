@@ -6,9 +6,7 @@
   <title>NoteIT — Home</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="home_style.css"/>
-  <link rel="icon" type="image/png" href="assets/icon.png">
 </head>
-
 <body>
 
   <!-- TOPBAR -->
@@ -17,24 +15,43 @@
     <div class="topbar-right">
       <span class="welcome" id="welcomeMsg">Loading...</span>
       <button class="btn-logout" id="logoutBtn">Sign Out</button>
+      <button class="btn-theme" id="themeToggle">☀️ Light Mode</button>
     </div>
   </div>
 
   <!-- MAIN -->
-  <div class="main">
-    <div class="section-header">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Search notes…" 
-        class="search-bar"
-      />
-      <div class="section-title">My Notes</div>
-      <button class="btn-new" id="newNoteBtn">+ New Note</button>
-    </div>
+  <div class="main shell">
+    <aside class="sidebar">
+      <div class="sidebar-label">Browse</div>
+      <button class="nav-tab active" data-filter="all" id="allNotesTab">
+        <span>All Notes</span>
+        <span class="nav-count" id="allCount">0</span>
+      </button>
+      <button class="nav-tab" data-filter="favorites" id="favoritesTab">
+        <span>Favorites</span>
+        <span class="nav-count" id="favoritesCount">0</span>
+      </button>
+    </aside>
+
+    <div class="content">
+      <div class="section-header">
+        <div>
+          <div class="section-title" id="sectionTitle">My Notes</div>
+        </div>
+        <button class="btn-new" id="newNoteBtn">+ New Note</button>
+      </div>
 
     <!-- COMPOSER -->
     <div class="composer" id="composer">
+
+      <!-- Text format bar -->
+       <div class = "textformatBar">
+        <button onclick="format('bold')"><b>B</b></button>
+        <button onclick="format('italic')"><i>I</i></button>
+        <button onclick="format('underline')"><u>U</u></button>
+        
+       </div>
+
       <input type="text" id="noteTitle" placeholder="Note title…"/>
       <textarea id="noteBody" placeholder="Write your note here…"></textarea>
       <div class="composer-footer">
@@ -44,6 +61,8 @@
           <option value="personal">🏠 Personal</option>
           <option value="other">📌 Other</option>
         </select>
+
+      <input type="text" id="newFolderInput" placeholder="create new folder" style="display:none;">
         <div class="composer-btns">
           <button class="btn-cancel" id="cancelBtn">Cancel</button>
           <button class="btn-save" id="saveBtn">Save Note</button>
@@ -52,14 +71,15 @@
     </div>
 
     <!-- NOTES -->
-    <div class="notes-grid" id="notesGrid">
-      <div class="loading">Loading your notes...</div>
-    </div>
+      <div class="notes-grid" id="notesGrid">
+        <div class="loading">Loading your notes...</div>
+      </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
-<script type="module" src="home.js"></script>
-
+  <script type="module" src="home.js"></script>
+  <script type="module" src="toggle.js"></script>
+  
 </body>
 </html>

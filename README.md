@@ -5,7 +5,7 @@ Project Description: Web-based notetaking app that would be able to use text and
 
 
 
-Group Members & Roles:
+Group Members:
 Shari Li
 Khushi Patel  
 Sade Adeaca
