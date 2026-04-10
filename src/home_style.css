@@ -29,9 +29,101 @@
       align-items: center; 
       gap: 14px; 
     }
+    .profile-menu {
+      position: relative;
+    }
     .welcome {
       font-size: .85rem;
       color: rgba(255,255,255,.5);
+    }
+    .welcome-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.78);
+      padding: 10px 14px;
+      border-radius: 999px;
+    }
+    .welcome-button::after {
+      content: "▾";
+      font-size: .72rem;
+      color: rgba(255,255,255,.52);
+    }
+    .welcome-button:hover {
+      border-color: rgba(143,191,154,.4);
+      color: #f0f0f0;
+      transform: translateY(-1px);
+    }
+    .profile-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(300px, calc(100vw - 32px));
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(26,29,35,.98);
+      box-shadow: 0 20px 48px rgba(0,0,0,.32);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px) scale(.98);
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 1100;
+    }
+    .profile-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    .profile-panel-head {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .profile-panel-label {
+      margin-bottom: 8px;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      color: rgba(143,191,154,.82);
+    }
+    .profile-panel-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+    .profile-panel-email {
+      color: rgba(255,255,255,.58);
+      font-size: .85rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .profile-panel-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .profile-action {
+      width: 100%;
+      text-align: left;
+      padding: 11px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,.04);
+      color: #f4f7f2;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+    }
+    .profile-action:hover {
+      border-color: rgba(143,191,154,.42);
+      background: rgba(143,191,154,.12);
+    }
+    .profile-action-danger:hover {
+      border-color: rgba(255,107,107,.42);
+      background: rgba(255,107,107,.12);
+      color: #ffd3d3;
     }
     /*button basic*/
     button {
@@ -74,6 +166,9 @@
     .btn-theme:hover { 
       border-color: rgba(200,240,74,.5); 
       color: #f0f0f0; 
+    }
+    .profile-theme-anchor {
+      display: none;
     }
 
     /* MAIN */
@@ -445,13 +540,18 @@
       position: absolute;
       top: 14px;
       right: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(12,12,15,.55);
       border: 1px solid rgba(255,255,255,.08);
       color: rgba(255,255,255,.35);
       width: 34px;
       height: 34px;
+      padding: 0;
       border-radius: 50%;
       font-size: 1rem;
+      line-height: 1;
       cursor: pointer;
       transition: all .18s;
     }
@@ -704,6 +804,10 @@
         justify-content: flex-end;
         flex-wrap: wrap;
       }
+      .profile-panel {
+        right: auto;
+        left: 0;
+      }
       .main {
         padding: 28px 18px;
       }
@@ -781,6 +885,45 @@
     }
     body.light-mode .welcome { 
       color: #555 !important; 
+    }
+    body.light-mode .welcome-button {
+      background: #f3f4f6;
+      border-color: #e5e7eb;
+      color: #111827;
+    }
+    body.light-mode .welcome-button::after {
+      color: #6b7280;
+    }
+    body.light-mode .profile-panel {
+      background: rgba(255,255,255,.98);
+      border-color: #e5e7eb;
+      box-shadow: 0 24px 50px rgba(15,23,42,.12);
+    }
+    body.light-mode .profile-panel-head {
+      border-bottom-color: #e5e7eb;
+    }
+    body.light-mode .profile-panel-label {
+      color: #5b8def;
+    }
+    body.light-mode .profile-panel-name {
+      color: #111827;
+    }
+    body.light-mode .profile-panel-email {
+      color: #4b5563;
+    }
+    body.light-mode .profile-action {
+      background: #f9fafb;
+      border-color: #e5e7eb;
+      color: #111827;
+    }
+    body.light-mode .profile-action:hover {
+      background: #eef6ff;
+      border-color: #bfd4ff;
+    }
+    body.light-mode .profile-action-danger:hover {
+      background: #fff1f1;
+      border-color: #f2c2c2;
+      color: #b83b3b;
     }
     body.light-mode .btn-new,body.light-mode .btn-save {
       background: #8FBF9A;

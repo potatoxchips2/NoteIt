@@ -17,16 +17,19 @@ import { auth, db } from "./firebase.js";
         return;
       }
       currentUser = user;
+      syncUserSettings(user);
       document.getElementById("welcomeMsg").textContent =
         "Hey, " + (user.displayName ? user.displayName.split(" ")[0] : user.email) + " 👋";
       loadNotes();
     });
 
     // ── LOGOUT ──
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
+    async function handleLogout() {
       await signOut(auth);
       window.location.href = "index.html";
-    });
+    }
+
+    document.getElementById("settingsLogoutBtn").addEventListener("click", handleLogout);
 
     // ── FOLDER SELECT LOGIC ──
     document.getElementById("noteFolder").addEventListener("change", function () {
@@ -70,12 +73,24 @@ import { auth, db } from "./firebase.js";
     const supportTopic = document.getElementById("supportTopic");
     const supportMessage = document.getElementById("supportMessage");
     const supportSubmit = document.getElementById("supportSubmit");
+    const profileMenuBtn = document.getElementById("profileMenuBtn");
+    const profilePanel = document.getElementById("profilePanel");
+
+    function setProfilePanel(isOpen) {
+      profilePanel.classList.toggle("open", isOpen);
+      profilePanel.setAttribute("aria-hidden", String(!isOpen));
+      profileMenuBtn.setAttribute("aria-expanded", String(isOpen));
+    }
 
     function setSupportPanel(isOpen) {
       supportPanel.classList.toggle("open", isOpen);
       supportPanel.setAttribute("aria-hidden", String(!isOpen));
       supportFab.setAttribute("aria-expanded", String(isOpen));
     }
+
+    profileMenuBtn.addEventListener("click", () => {
+      setProfilePanel(!profilePanel.classList.contains("open"));
+    });
 
     supportFab.addEventListener("click", () => {
       setSupportPanel(!supportPanel.classList.contains("open"));
@@ -85,9 +100,27 @@ import { auth, db } from "./firebase.js";
       setSupportPanel(false);
     });
 
+    document.getElementById("openSupportFromSettings").addEventListener("click", () => {
+      setProfilePanel(false);
+      setSupportPanel(true);
+    });
+
+    document.getElementById("settingsThemeBtn").addEventListener("click", () => {
+      document.getElementById("themeToggle").click();
+    });
+
     document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && profilePanel.classList.contains("open")) {
+        setProfilePanel(false);
+      }
       if (event.key === "Escape" && supportPanel.classList.contains("open")) {
         setSupportPanel(false);
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!profilePanel.contains(event.target) && !profileMenuBtn.contains(event.target)) {
+        setProfilePanel(false);
       }
     });
 
@@ -413,6 +446,13 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       other: "#9AA3AF"
     }[folder] || "#8FBF9A";
   }
+
+    function syncUserSettings(user) {
+      const displayName = user.displayName || "NoteIT User";
+      const email = user.email || "No email available";
+      document.getElementById("settingsName").textContent = displayName;
+      document.getElementById("settingsEmail").textContent = email;
+    }
 
     let toastTimer;
     function showToast(msg, isErr = false) {

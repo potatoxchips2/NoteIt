@@ -13,9 +13,24 @@
   <div class="topbar">
     <div class="logo">Note<span>IT</span></div>
     <div class="topbar-right">
-      <span class="welcome" id="welcomeMsg">Loading...</span>
-      <button class="btn-logout" id="logoutBtn">Sign Out</button>
-      <button class="btn-theme" id="themeToggle">☀️ Light Mode</button>
+      <div class="profile-menu">
+        <button class="welcome welcome-button" id="profileMenuBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="profilePanel">
+          <span id="welcomeMsg">Loading...</span>
+        </button>
+        <section class="profile-panel" id="profilePanel" aria-hidden="true">
+          <div class="profile-panel-head">
+            <div class="profile-panel-label">Settings</div>
+            <div class="profile-panel-name" id="settingsName">Loading...</div>
+            <div class="profile-panel-email" id="settingsEmail">Loading...</div>
+          </div>
+          <div class="profile-panel-actions">
+            <button class="profile-action" id="settingsThemeBtn" type="button">Toggle Theme</button>
+            <button class="profile-action" id="openSupportFromSettings" type="button">Support</button>
+            <button class="profile-action profile-action-danger" id="settingsLogoutBtn" type="button">Sign Out</button>
+          </div>
+        </section>
+      </div>
+      <button class="btn-theme profile-theme-anchor" id="themeToggle">☀️ Light Mode</button>
     </div>
   </div>
 

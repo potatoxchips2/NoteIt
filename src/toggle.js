@@ -1,11 +1,23 @@
 
-document.getElementById("themeToggle").addEventListener("click", function() {
+const themeToggleBtn = document.getElementById("themeToggle");
+const settingsThemeBtn = document.getElementById("settingsThemeBtn");
+
+function syncThemeLabels(isLight) {
+  themeToggleBtn.textContent = isLight ? "🌙 Dark Mode" : "☀️ Light Mode";
+  if (settingsThemeBtn) {
+    settingsThemeBtn.textContent = isLight ? "Dark Mode" : "Light Mode";
+  }
+}
+
+themeToggleBtn.addEventListener("click", function() {
   const isLight = document.body.classList.toggle("light-mode");
-  this.textContent = isLight ? "🌙 Dark Mode" : "☀️ Light Mode";
+  syncThemeLabels(isLight);
   localStorage.setItem("theme", isLight ? "light" : "dark");
 });
 
-if (localStorage.getItem("theme") === "light") {
+const storedTheme = localStorage.getItem("theme");
+if (storedTheme === "light") {
   document.body.classList.add("light-mode");
-  document.getElementById("themeToggle").textContent = "🌙 Dark Mode";
 }
+
+syncThemeLabels(document.body.classList.contains("light-mode"));
