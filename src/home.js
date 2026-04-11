@@ -59,9 +59,7 @@ import { auth, db } from "./firebase.js";
       selectedFolderFilter = null;
 
       document.querySelectorAll(".nav-tab")
-        .forEach(el => el.classList.remove("active"));
-
-      doc        
+        .forEach(el => el.classList.remove("active"));        
 
       updateFilterTabs();
       loadNotes();
@@ -102,12 +100,26 @@ import { auth, db } from "./firebase.js";
       try {
         // Update existing note
         if (editingNoteId) {
-          await updateDoc(doc(db, "notes", editingNoteId), {
-            title: title,
-            text: body,
-            folder: folder,
-            folderColor: folderColor,
+          
+          if (selectedFolder === "other") {
+            if (!newFolder) {
+              showToast("Please enter a folder name", true);
+              return;
+            }
+
+          await addDoc(collection(db, "folders"), {
+            name: newFolder,
+            color: pickedColor,
+            userId: currentUser.uid,
+          });
+        }
+        await updateDoc(doc(db, "notes", editingNoteId), {
+          title: title,
+          text: body,
+          folder: folder,
+          folderColor: folderColor,
         });
+
         showToast("Note saved ✓");
         editingNoteId = null;
         } else {
