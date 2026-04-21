@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, orderBy, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth, db } from "./firebase.js";
     
   document.addEventListener("DOMContentLoaded", () => {
@@ -8,6 +8,20 @@ import { auth, db } from "./firebase.js";
     let currentFilter = "all";
     let searchTerm = "";
     let selectedFolderFilter = null;
+    let quill;
+
+    // Text Editor
+    quill = new Quill('#editor', {
+        placeholder: 'Write your note here…',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['link']
+          ]
+        }
+      });
+
 
     updateFilterTabs();
 
@@ -54,7 +68,7 @@ import { auth, db } from "./firebase.js";
     document.getElementById("cancelBtn").addEventListener("click", () => {
       document.getElementById("composer").classList.remove("open");
       document.getElementById("noteTitle").value = "";
-      document.getElementById("noteBody").value = "";
+      quill.root.innerHTML = "";
     });
 
     // FAVORITE FILTER //
@@ -189,7 +203,7 @@ import { auth, db } from "./firebase.js";
     // SAVE AND EDIT NOTE
     document.getElementById("saveBtn").addEventListener("click", async () => {
       const title = document.getElementById("noteTitle").value.trim();
-      const body = document.getElementById("noteBody").value.trim();
+      const body = quill.root.innerHTML.trim();
 
       const selectedFolder = document.getElementById("noteFolder").value;
       const newFolder = document.getElementById("newFolderInput")?.value.trim();
@@ -204,7 +218,10 @@ import { auth, db } from "./firebase.js";
         :getFolderColor(folder);
 
       if (!title) { showToast("Please add a title!", true); return; }
-      if (!body)  { showToast("Note can't be empty!", true); return; }
+      if (!quill.getText().trim()) {
+        showToast("Note can't be empty!", true);
+        return;
+      }
       if (!currentUser) return;
 
       try {
@@ -266,7 +283,7 @@ import { auth, db } from "./firebase.js";
         }
 
         document.getElementById("noteTitle").value = "";
-        document.getElementById("noteBody").value = "";
+        quill.root.innerHTML = "";
         document.getElementById("composer").classList.remove("open");
 
         document.getElementById("newFolderInput").value = "";
@@ -446,7 +463,7 @@ import { auth, db } from "./firebase.js";
           <button class="btn-favorite ${data.isFavorite ? "active" : ""}" data-id="${docSnap.id}">★</button>
           <div class="note-folder">${folderLabel(data.folder)}</div>
           <div class="note-title">${escHtml(data.title || "Untitled")}</div>
-          <div class="note-preview">${escHtml(data.text || "")}</div>
+          <div class="note-preview">${data.text || ""}</div>
           <div class="note-footer">
           <span>${date}</span>
           <div class="note-action">
@@ -543,7 +560,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
             const color = document.getElementById("folderColorPicker");
 
             document.getElementById("noteTitle").value = data.title || "";
-            document.getElementById("noteBody").value = data.text || "";
+            quill.root.innerHTML = data.text || "";
 
             const isCustom = !["school","work","personal","other"].includes(data.folder);
 
