@@ -21,9 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
       status.className = "status error";
       if (err.code === "auth/popup-blocked") {
-        status.textContent = "⚠️ Popup blocked! In Safari go to Settings → Websites → Pop-up Windows → set 127.0.0.1 to Allow.";
+        status.textContent = "Popup blocked! In Safari go to Settings → Websites → Pop-up Windows → set 127.0.0.1 to Allow.";
       } else if (err.code === "auth/unauthorized-domain") {
-        status.textContent = "⚠️ Go to Firebase Console → Authentication → Settings → Authorized Domains → Add 127.0.0.1";
+        status.textContent = "Go to Firebase Console → Authentication → Settings → Authorized Domains → Add 127.0.0.1";
       } else {
         status.textContent = "❌ " + err.message;
       }
