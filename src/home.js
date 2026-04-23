@@ -12,6 +12,7 @@ import { auth, db } from "./firebase.js";
 
     // Text Editor
     quill = new Quill('#editor', {
+      theme: 'snow',
         placeholder: 'Write your note here…',
         modules: {
           toolbar: [

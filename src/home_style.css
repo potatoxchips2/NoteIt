@@ -172,7 +172,11 @@
     }
 
     /* MAIN */
-    .main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+    .main { 
+      max-width: 900px; 
+      margin: 0 auto; 
+      padding: 40px 24px; 
+    }
     .shell {
       max-width: 1200px;
       display: grid;
@@ -236,12 +240,6 @@
     .btn-logout:hover { 
       border-color: #ff6b6b; 
       color: #ff6b6b; 
-    }
-
-    /* MAIN */
-    .main { max-width: 900px; 
-      margin: 0 auto; 
-      padding: 40px 24px; 
     }
 
     .section-header {
@@ -384,6 +382,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-top: 10px;
     }
     .composer select {
       background: #1F2A24;
@@ -907,7 +906,7 @@
       border-radius: 0 0 10px 10px;
       min-height: 120px;
       box-shadow: none !important;
-      margin-top: 0;
+      margin-top: 0; 
     }
 
     .ql-editor {
