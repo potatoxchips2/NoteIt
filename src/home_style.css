@@ -692,6 +692,19 @@
       color: rgba(var(--accent-rgb), .7);
       pointer-events: none;
     }
+    .note-editor b,
+    .note-editor strong {
+      font-weight: 900;
+      letter-spacing: .02em;
+      color: #ffffff;
+      text-shadow: 0 0 0.01px currentColor;
+    }
+    .note-editor .rt-size-1 { font-size: .82em; line-height: 1.55; }
+    .note-editor .rt-size-2 { font-size: .92em; line-height: 1.6; }
+    .note-editor .rt-size-3 { font-size: 1em; line-height: 1.65; }
+    .note-editor .rt-size-4 { font-size: 1.16em; line-height: 1.72; }
+    .note-editor .rt-size-5 { font-size: 1.32em; line-height: 1.8; }
+    .note-editor .rt-size-6 { font-size: 1.5em; line-height: 1.88; }
 
     .composer-footer {
       display: flex;
@@ -1667,6 +1680,8 @@
 
     .textformatBar {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 16px;
     } 
@@ -1678,11 +1693,43 @@
       color: #E6E6E6;
       font-family: 'DM Sans', sans-serif;
       font-size: .8rem;
+      font-weight: 700;
       padding: 6px 10px;
       outline: none;
       margin-bottom: 6px;
       transition: border-color .2s;
     } 
+    .textsize-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 6px;
+      border: 1px solid #1F2A24;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,.04);
+    }
+    .textsize-control button {
+      min-width: 34px;
+      margin-bottom: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 6px 10px;
+      font-size: .95rem;
+      line-height: 1;
+    }
+    .textsize-indicator {
+      min-width: 36px;
+      padding: 6px 10px;
+      text-align: center;
+      font-size: .78rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.86);
+      border-left: 1px solid rgba(255,255,255,.08);
+      border-right: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+    }
 
     .textformatBar button:hover { 
       border-color: var(--accent-color); 
@@ -1701,4 +1748,14 @@
       background: rgba(var(--accent-rgb), .14);
       border-color: var(--accent-color);
       color: #2f5d38;
+    }
+    body.light-mode .textsize-control {
+      background: #f3f4f6;
+      border-color: #d7dde3;
+    }
+    body.light-mode .textsize-indicator {
+      color: #1f2937;
+      background: #ffffff;
+      border-left-color: #d7dde3;
+      border-right-color: #d7dde3;
     }

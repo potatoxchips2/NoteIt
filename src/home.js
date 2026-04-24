@@ -1099,9 +1099,22 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       if (!noteBody) return;
       const selection = window.getSelection();
       if (!selection) return;
+      const formatCommands = ["bold", "italic", "underline"];
+      const activeRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+      const activeSelectionInEditor = activeRange && noteBody.contains(activeRange.commonAncestorContainer);
 
-      let range = savedNoteRange ? savedNoteRange.cloneRange() : (selection.rangeCount ? selection.getRangeAt(0) : null);
+      let range = activeSelectionInEditor ? activeRange : (savedNoteRange ? savedNoteRange.cloneRange() : null);
       const hasSelectionInEditor = range && noteBody.contains(range.commonAncestorContainer);
+      const hadExpandedSelection = Boolean(range && !range.collapsed && hasSelectionInEditor);
+
+      if (formatType === "size-up" || formatType === "size-down") {
+        adjustTextSize(range, selection, noteBody, formatType === "size-up" ? 1 : -1, hadExpandedSelection);
+        rememberNoteSelection();
+        updateFormatButtons();
+        return;
+      }
+
+      const previousStates = getFormatStates(formatCommands);
 
       if (!hasSelectionInEditor) {
         range = document.createRange();
@@ -1115,6 +1128,24 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       selection.removeAllRanges();
       selection.addRange(range);
       document.execCommand(formatType, false);
+
+      if (hadExpandedSelection) {
+        const caretRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : range.cloneRange();
+        caretRange.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(caretRange);
+        syncFormatStates(formatCommands, {
+          bold: false,
+          italic: false,
+          underline: false,
+        });
+      } else {
+        syncFormatStates(formatCommands, {
+          ...previousStates,
+          [formatType]: !previousStates[formatType],
+        });
+      }
+
       rememberNoteSelection();
       updateFormatButtons();
     }
@@ -1134,12 +1165,109 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       const noteBody = document.getElementById("noteBody");
       const hasEditorFocus = document.activeElement === noteBody;
       const formatButtons = document.querySelectorAll(".textformatBar button");
+      const sizeIndicator = document.getElementById("textSizeIndicator");
+      const currentSize = getCurrentTextSizeLevel(noteBody);
 
       formatButtons.forEach((button) => {
         const formatType = button.dataset.format;
-        const command = formatType === "italic" ? "italic" : formatType;
-        const isActive = hasEditorFocus && document.queryCommandState(command);
+        const isActive = ["size-up", "size-down"].includes(formatType)
+          ? false
+          : hasEditorFocus && document.queryCommandState(formatType);
         button.classList.toggle("active", Boolean(isActive));
+      });
+
+      if (sizeIndicator) {
+        sizeIndicator.textContent = String(currentSize);
+      }
+    }
+
+    function getFormatStates(commands) {
+      return commands.reduce((state, command) => {
+        state[command] = document.queryCommandState(command);
+        return state;
+      }, {});
+    }
+
+    function syncFormatStates(commands, desiredStates) {
+      commands.forEach((command) => {
+        const isActive = document.queryCommandState(command);
+        const shouldBeActive = Boolean(desiredStates[command]);
+        if (isActive !== shouldBeActive) {
+          document.execCommand(command, false);
+        }
+      });
+    }
+
+    function adjustTextSize(range, selection, noteBody, delta, hadExpandedSelection) {
+      const existingWrapper = findTextSizeWrapper(range.commonAncestorContainer, noteBody);
+      const currentSize = existingWrapper ? getTextSizeLevel(existingWrapper) : 3;
+      const nextSize = Math.max(1, Math.min(6, currentSize + delta));
+
+      if (!hadExpandedSelection) {
+        applyTypingTextSize(range, selection, existingWrapper, nextSize);
+        return;
+      }
+
+      const wrapper = document.createElement("span");
+      wrapper.className = `rt-size-${nextSize}`;
+
+      const contents = range.extractContents();
+      flattenTextSizeWrappers(contents);
+      wrapper.appendChild(contents);
+      range.insertNode(wrapper);
+
+      const nextRange = document.createRange();
+      nextRange.selectNodeContents(wrapper);
+      selection.removeAllRanges();
+      selection.addRange(nextRange);
+      savedNoteRange = nextRange.cloneRange();
+    }
+
+    function applyTypingTextSize(range, selection, existingWrapper, nextSize) {
+      if (existingWrapper) {
+        existingWrapper.className = `rt-size-${nextSize}`;
+        savedNoteRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : range.cloneRange();
+        return;
+      }
+
+      const wrapper = document.createElement("span");
+      wrapper.className = `rt-size-${nextSize}`;
+      const marker = document.createTextNode("\u200b");
+      wrapper.appendChild(marker);
+      range.insertNode(wrapper);
+
+      const nextRange = document.createRange();
+      nextRange.setStart(marker, 1);
+      nextRange.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(nextRange);
+      savedNoteRange = nextRange.cloneRange();
+    }
+
+    function findTextSizeWrapper(node, noteBody) {
+      const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+      const wrapper = element?.closest?.("[class*='rt-size-']");
+      return wrapper && noteBody.contains(wrapper) ? wrapper : null;
+    }
+
+    function getTextSizeLevel(wrapper) {
+      const match = Array.from(wrapper.classList).find((className) => /^rt-size-[1-6]$/.test(className));
+      return match ? Number(match.replace("rt-size-", "")) : 3;
+    }
+
+    function getCurrentTextSizeLevel(noteBody) {
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount || !noteBody) return 3;
+      const wrapper = findTextSizeWrapper(selection.getRangeAt(0).commonAncestorContainer, noteBody);
+      return wrapper ? getTextSizeLevel(wrapper) : 3;
+    }
+
+    function flattenTextSizeWrappers(fragment) {
+      fragment.querySelectorAll?.("[class*='rt-size-']").forEach((wrapper) => {
+        while (wrapper.firstChild) {
+          wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+        }
+        wrapper.remove();
       });
     }
 
@@ -1187,7 +1315,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
           return document.createDocumentFragment();
         }
 
-        const allowedTags = new Set(["B", "STRONG", "I", "EM", "U", "BR", "DIV"]);
+        const allowedTags = new Set(["B", "STRONG", "I", "EM", "U", "BR", "DIV", "SPAN"]);
         const tagName = node.tagName.toUpperCase();
         const fragment = document.createDocumentFragment();
 
@@ -1200,6 +1328,13 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
         }
 
         const cleanNode = document.createElement(tagName.toLowerCase());
+        if (tagName === "SPAN") {
+          const sizeClass = Array.from(node.classList).find((className) => /^rt-size-[1-6]$/.test(className));
+          if (!sizeClass) {
+            return fragment;
+          }
+          cleanNode.className = sizeClass;
+        }
         cleanNode.appendChild(fragment);
         return cleanNode;
       };
@@ -1210,6 +1345,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
       });
 
       return container.innerHTML
+        .replace(/\u200b/g, "")
         .replace(/<div><br><\/div>/gi, "<br>")
         .replace(/<\/div><div>/gi, "<br>")
         .replace(/^<div>/i, "")
@@ -1221,7 +1357,7 @@ grid.querySelectorAll(".btn-copy").forEach(btn => {
     }
 
     function normalizePlainText(text) {
-      return text.replace(/\u00a0/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+      return text.replace(/\u00a0/g, " ").replace(/\u200b/g, "").replace(/\n{3,}/g, "\n\n").trim();
     }
 
     async function findExistingCustomFolder(folderName) {
